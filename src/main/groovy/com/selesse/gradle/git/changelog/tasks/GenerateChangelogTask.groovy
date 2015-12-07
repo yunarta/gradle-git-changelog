@@ -12,9 +12,16 @@ import org.gradle.api.tasks.TaskAction
 class GenerateChangelogTask extends DefaultTask {
     GitChangelogExtension extension
 
+    String gitDirectory
+
     public GenerateChangelogTask() {
         this.description = 'Generates a changelog'
         this.group = 'build'
+        this.gitDirectory = '.'
+    }
+
+    public void setGitDirectory(String gitDirectory) {
+        this.gitDirectory = gitDirectory
     }
 
     @TaskAction
@@ -30,9 +37,9 @@ class GenerateChangelogTask extends DefaultTask {
             ChangelogWriter changelogWriter
             if (format == "markdown") {
                 format = "md"
-                changelogWriter = createMarkdownChangelogWriter(extension)
+                changelogWriter = createMarkdownChangelogWriter(extension, gitDirectory)
             } else {
-                changelogWriter = createHtmlChangelogWriter(extension)
+                changelogWriter = createHtmlChangelogWriter(extension, gitDirectory)
             }
 
             String fileName = extension.fileName
@@ -45,19 +52,23 @@ class GenerateChangelogTask extends DefaultTask {
         }
     }
 
-    static def createMarkdownChangelogWriter(GitChangelogExtension extension) {
+    static def createMarkdownChangelogWriter(GitChangelogExtension extension, String gitDirectory) {
         String commitFormat = MoreObjects.firstNonNull(
                 extension.markdownConvention.commitFormat, extension.commitFormat
         )
         def gitExecutor = new GitCommandExecutor(commitFormat)
+        gitExecutor.setGitDirectory(gitDirectory)
+
         return new MarkdownChangelogWriter(extension, gitExecutor)
     }
 
-    static def createHtmlChangelogWriter(GitChangelogExtension extension) {
+    static def createHtmlChangelogWriter(GitChangelogExtension extension, String gitDirectory) {
         String commitFormat = MoreObjects.firstNonNull(
                 extension.htmlConvention.commitFormat, extension.commitFormat
         )
         def gitExecutor = new GitCommandExecutor(commitFormat)
+        gitExecutor.setGitDirectory(gitDirectory)
+
         return new HtmlChangelogWriter(extension, gitExecutor)
     }
 }

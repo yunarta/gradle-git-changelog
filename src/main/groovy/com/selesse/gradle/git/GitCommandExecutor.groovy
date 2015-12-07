@@ -9,6 +9,7 @@ class GitCommandExecutor {
     Logger logger = Logging.getLogger(ComplexChangelogGenerator)
     private File executionContext
     private String changelogFormat
+    private String gitDirectory = '.'
 
     GitCommandExecutor(String changelogFormat) {
         this.changelogFormat = changelogFormat
@@ -19,19 +20,23 @@ class GitCommandExecutor {
         this.executionContext = context
     }
 
+    public void setGitDirectory(String gitDirectory) {
+        this.gitDirectory = gitDirectory;
+    }
+
     public List<String> getTags() {
         Splitter.on("\n").omitEmptyStrings().trimResults().splitToList(
-                executeCommand('git', 'for-each-ref', '--format=%(objectname) | %(taggerdate)', 'refs/tags')
+                executeCommand('git', '-C', gitDirectory, 'for-each-ref', '--format=%(objectname) | %(taggerdate)', 'refs/tags')
         )
     }
 
     public String getLastTag() {
-        return executeCommand('git', 'describe', '--abbrev=0', '--tags')
+        return executeCommand('git', '-C', gitDirectory, 'describe', '--abbrev=0', '--tags')
     }
 
     public List<String> getTagsSince(String ref) {
         Splitter.on("\n").omitEmptyStrings().trimResults().splitToList(
-                executeCommand('git', 'tag', '--contains', ref)
+                executeCommand('git', '-C', gitDirectory, 'tag', '--contains', ref)
         )
     }
 
@@ -44,15 +49,15 @@ class GitCommandExecutor {
     }
 
     public String getCommitDate(String commit) {
-        executeCommand('git', 'log', '-1', '--format=%ai', commit)
+        executeCommand('git', '-C', gitDirectory, 'log', '-1', '--format=%ai', commit)
     }
 
     private String[] getBaseGitCommand() {
-        ['git', 'log', "--pretty=format:${changelogFormat}"]
+        ['git', '-C', gitDirectory, 'log', "--pretty=format:${changelogFormat}"]
     }
 
     public String getGitChangelog() {
-        executeCommand('git', 'log', "--pretty=format:${changelogFormat}")
+        executeCommand('git', '-C', gitDirectory, 'log', "--pretty=format:${changelogFormat}")
     }
 
     public String getGitChangelog(String reference) {
@@ -66,14 +71,14 @@ class GitCommandExecutor {
     }
 
     public String getTagName(String commit) {
-        executeCommand('git', 'describe', '--tags', commit)
+        executeCommand('git', '-C', gitDirectory, 'describe', '--tags', commit)
     }
 
     public String getTagDate(String tag) {
-        executeCommand('git', 'log', '-1', '--format=%ai', tag)
+        executeCommand('git', '-C', gitDirectory, 'log', '-1', '--format=%ai', tag)
     }
 
     public String getLatestCommit() {
-        executeCommand('git', 'log', '-1', '--pretty=format:%H')
+        executeCommand('git', '-C', gitDirectory, 'log', '-1', '--pretty=format:%H')
     }
 }

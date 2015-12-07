@@ -28,6 +28,7 @@ class GitLogPlugin implements Plugin<Project> {
 
     def applyPluginDependency(Project project) {
         GenerateChangelogTask task = project.tasks.create("generateChangelog", GenerateChangelogTask)
+        task.setGitDirectory(project.projectDir.absolutePath)
 
         project.afterEvaluate {
             project.plugins.withType(JavaPlugin) {
