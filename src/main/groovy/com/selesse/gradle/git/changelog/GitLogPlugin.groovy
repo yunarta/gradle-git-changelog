@@ -46,11 +46,17 @@ class GitLogPlugin implements Plugin<Project> {
             if (project.plugins.findPlugin(JavaPlugin) == null) {
                 project.plugins.withType(BasePlugin) {
                     logger.debug("Configuring Base Plugin")
-                    Task assembleTask = project.tasks.getByName("assemble") as Task
-                    if (assembleTask != null) {
-                        logger.debug("Making assembleTask depend on ${task.name}")
-                        assembleTask.dependsOn(task)
+
+                    project.tasks.getByName("assemble")
+                    project.tasks.findAll { t -> t.name.startsWith('assemble') }.each {
+                        it.dependsOn(task)
                     }
+
+//                    Task assembleTask = project.tasks.getByName("assemble") as Task
+//                    if (assembleTask != null) {
+//                        logger.debug("Making assembleTask depend on ${task.name}")
+//                        assembleTask.dependsOn(task)
+//                    }
                 }
             }
         }
