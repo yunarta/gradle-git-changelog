@@ -3,7 +3,7 @@ apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 
 group = 'com.mobilesolutionworks'
-version = '0.3.4'
+version = '0.3.6'
 
 sourceCompatibility = 1.6
 
