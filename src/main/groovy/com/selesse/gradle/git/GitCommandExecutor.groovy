@@ -41,6 +41,11 @@ class GitCommandExecutor {
     }
 
     private String executeCommand(String... args) {
+        for (String arg : args) {
+            print(arg + " ");
+        }
+        System.out.println();
+
         if (executionContext != null) {
             args.execute(null, executionContext).text.trim()
         } else {
